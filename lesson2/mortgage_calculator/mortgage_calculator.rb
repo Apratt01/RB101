@@ -1,9 +1,11 @@
 require 'yaml'
 MESSAGES = YAML.load_file('mortgage_messages.yml')
 
-# auto adds => before every print line
-def prompt(message)
-  puts("=> #{message}")
+# allows the use of variables in the YAML file
+def format_message(key, *args)
+  message_template = MESSAGES[key]
+  formatted_message = "=> #{message_template % args}"
+  puts formatted_message
 end
 
 # checks to see if variable is an integer
@@ -41,7 +43,7 @@ def whole_and_positive?(input)
   integer?(input) && !negative?(input) && input != '0'
 end
 
-def hanging_zero?(num) # solves edge case, if user enters 0.50 instead of 0.5
+def hanging_zero!(num) # solves edge case, if user enters 0.50 instead of 0.5
   if num != '0' && num[-1] == '0' && num.include?('.')
     loop do
       num.chop!
@@ -54,7 +56,7 @@ def hanging_zero?(num) # solves edge case, if user enters 0.50 instead of 0.5
 end
 
 def validate_zero # solves edge case, zero is an error
-  prompt(MESSAGES['zero'])
+  format_message('zero')
   answer = gets.chomp.downcase
   answer == 'y'
 end
@@ -65,17 +67,23 @@ def formatting(num) # formats numbers to 2 decimal places and adds commas
 end
 
 def get_name
+  name = ''
   loop do
-    prompt(MESSAGES['welcome'])
+    format_message('welcome')
     name = gets.chomp
-    name.empty? ? prompt(MESSAGES['valid_name']) : break
+    if name.empty? || name.start_with?(' ')
+      format_message('valid_name')
+    else
+      break
+    end
   end
+  name
 end
 
 def get_loan
-  prompt(MESSAGES['loan_amount'])
+  format_message('loan_amount')
   amount = gets.chomp
-  hanging_zero?(amount)
+  hanging_zero!(amount)
 end
 
 def loan_validation
@@ -84,37 +92,35 @@ def loan_validation
     amount = get_loan
     break if number_and_positive?(amount)
     if amount == '0'
-      prompt(MESSAGES['zero_loan'])
+      format_message('zero_loan')
     else
-      prompt(MESSAGES['invalid_entry'])
+      format_message('invalid_entry')
     end
   end
   amount
 end
 
 def get_apr
-  prompt(MESSAGES['apr_amount'])
+  format_message('apr_amount')
   percent = gets.chomp
-  hanging_zero?(percent)
+  hanging_zero!(percent)
 end
 
 def apr_validation
   percent = ''
   loop do
     percent = get_apr
-    if number_and_positive?(percent)
-      break
-    elsif zero?(percent)
+    if number_and_positive?(percent) || zero?(percent)
       break
     else
-      prompt(MESSAGES['invalid_entry'])
+      format_message('invalid_entry')
     end
   end
   percent
 end
 
 def get_loan_year
-  prompt(MESSAGES['loan_year'])
+  format_message('loan_year')
   gets.chomp
 end
 
@@ -122,19 +128,17 @@ def loan_year_validation
   year = ''
   loop do
     year = get_loan_year
-    if whole_and_positive?(year)
-      break
-    elsif zero?(year)
+    if whole_and_positive?(year) || zero?(year)
       break
     else
-      prompt(MESSAGES['invalid_entry'])
+      format_message('invalid_entry')
     end
   end
   year
 end
 
 def get_loan_month
-  prompt(MESSAGES['loan_month'])
+  format_message('loan_month')
   gets.chomp
 end
 
@@ -142,12 +146,10 @@ def loan_month_validation
   month = ''
   loop do
     month = get_loan_month
-    if whole_and_positive?(month)
-      break
-    elsif zero?(month)
+    if whole_and_positive?(month) || zero?(month)
       break
     else
-      prompt(MESSAGES['invalid_entry'])
+      format_message('invalid_entry')
     end
   end
   month
@@ -163,7 +165,9 @@ def monthly_apr(annual_apr) # converts annual apr to monthly apr
 end
 
 def payment(loan, apr, time) # calculates the monthly payment
-  if apr == '0'
+  if time == 0
+    loan
+  elsif apr == '0'
     loan.to_f / time
   else
     apr = monthly_apr(apr)
@@ -171,7 +175,7 @@ def payment(loan, apr, time) # calculates the monthly payment
   end
 end
 
-get_name
+user = get_name
 
 loop do
   loan_amount = loan_validation
@@ -185,14 +189,10 @@ loop do
   apr = formatting(apr)
   monthly_payment = formatting(monthly_payment)
 
-  prompt("Summary:
-    A loan of $#{loan_amount} at an APR of %#{apr} (rounded),
-    with a remaining time of #{loan_duration} months,
-    has a monthly payment of $#{monthly_payment}.")
-
-  prompt(MESSAGES['another_calc'])
+  format_message('summary', loan_amount, apr, loan_duration, monthly_payment)
+  format_message('another_calc')
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-prompt(MESSAGES['goodbye'])
+format_message('goodbye', user)
