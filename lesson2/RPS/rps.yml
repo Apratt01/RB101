@@ -1,0 +1,29 @@
+greeting: "Hello, welcome to the game of rock, paper, scissors, 
+           spock, and lizard!
+           \n The game will play until 3 total games are won.
+           \n Player, what is your name?"
+invalid_name: "That is not a valid entry."
+name: "Player, what is your name?"
+welcome: "%s, thank you for playing, let's begin!"
+choices: "Choose one: 
+          \n (R) for Rock
+          \n (L) for Lizard
+          \n (Sp) for Spock
+          \n (Sc) for Scissors
+          \n (P)for Paper"
+chosen: "You chose %s; Computer chose: %s."
+invalid_choice: "That not a valid choice, try again"
+win: "%s won!"
+computer_win: "Computer wins!"
+tie: "It's a tie"
+no_tie: "Tie's don't count!"
+game_winner_player: "The winner of the game, with 3 wins is, %s!
+             \n Congratulations!"
+game_winner_computer: "The winner of the game, with 3 wins is the Computer!
+             \n Congratulations!"
+current_score: "The current score is %s has %s, the Computer has %s."
+player_winning: "With that score, %s is winning!"
+computer_winning: "With that score, the Computer is winning!"
+tied_score: "With that score, it is an even tie!"
+play_again: "Do you want to play again? (Y to continue)"
+goodbye: "Thank you for playing. Good bye!"
